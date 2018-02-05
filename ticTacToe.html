@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Simple HTML5 Tic Tac Toe</title>
+	<style>
+		@font-face {
+			font-family: 'mario';
+			src: url('font/mario-webfont.eot');
+			src: url('font/mario-webfont.eot?#iefix') format('embedded-opentype'),
+				 url('font/mario-webfont.woff2') format('woff2'),
+				 url('font/mario-webfont.woff') format('woff'),
+				 url('font/mario-webfont.ttf') format('truetype'),
+				 url('font/mario-webfont.svg#nsmbwii_1regular') format('svg');
+			font-weight: normal;
+			font-style: normal;
+		}
+		body{
+			font-family:mario;
+			color:#c74c0e;
+		}
+		
+		.myButton{
+			background-color:#5c91fa;
+			font-size:36pt;
+			border:2pt solid #c74c0e;
+			-webkit-border-radius: 5px;
+			border-radius: 5px;
+			padding:5px;
+		}
+	</style>
+	<script>
+		var canvas;
+		var context
+		var mario;
+		var mushroom;
+		var bg;
+		var x;
+		var y;
+		var player = 0;
+		var played = [-1,-2,-3,-4,-5,-6,-7,-8,-9];//9 0
+		var grid;
+		var playerName = ["Mario", "Mushroom"];
+		function getDrawingSurfaces(){
+			canvas = document.getElementById("theBoard");
+			context = canvas.getContext("2d");	//can use webgl for 3d graphics
+			//setup clickable canvas
+			//canvas.addEventListener("mousedown", placeSomeImages, false);
+			/*moved to drawboard
+            canvas.addEventListener("mousedown", play, false);*/
+			//event, method
+		}
+		
+		function getImages(){
+			bg = document.getElementById("bg");
+			mario = document.getElementById("marioImg");
+			mushroom = document.getElementById("mushroomImg");
+		}
+		
+		function drawBoard(){
+			context.clearRect( 0 , 0 , canvas.width, canvas.height );
+			context.drawImage(bg,0,0);
+			
+			context.beginPath();
+			context.moveTo(100,0);	//the mario board is at 327, 1/2 is 13.5
+			context.lineTo(100, 300);
+			
+			context.moveTo(200,0);	//the mario board is at 327, 1/2 is 13.5
+			context.lineTo(200, 300);
+			
+			context.moveTo(0,100);	//the mario board is at 327, 1/2 is 13.5
+			context.lineTo(300,100 );
+			
+			context.moveTo(0,200);	//the mario board is at 327, 1/2 is 13.5
+			context.lineTo(300,200 );
+			
+			context.strokeStyle="#c74c0e";
+			context.lineWidth=8;
+			context.stroke();
+            canvas.addEventListener("mousedown", play, false);
+		}
+		
+		function placeSomeImages(){
+			//this is just for testing
+			context.beginPath();
+			context.drawImage(mario, 25, 25);
+		}
+		
+		
+		function fixXY(){
+			//solves the problem of actual location within the canvas
+			var rect = canvas.getBoundingClientRect();
+			x = x-rect.left;
+			y = y-rect.top;
+			
+			//place into the correct block
+			if(x <= 100 && y <= 100){
+				x = 25;
+				y = 25;
+				grid = 0;
+			}
+			
+			else if(x>100 && x <= 200 && y <= 100){
+				x = 125;
+				y = 25;
+				grid = 1;
+			}
+			
+			else if(x>200 && x <= 300 && y <= 100){
+				x = 225;
+				y = 25;
+				grid = 2;
+			}
+			
+			else if(x <=100 && y >100 && y <=200){
+				x = 25;
+				y = 125;
+				grid = 3;
+			}
+			
+			else if(x>100 && x <= 200 && y <= 200)
+			{
+				x = 125;
+				y = 125;
+				grid = 4;
+			}
+			
+			else if(x>200 && x <= 300 && y <= 200){
+				x = 225;
+				y = 125;
+				grid = 5;
+			}
+			
+			else if(x <= 100 && y <= 300){
+				x = 25;
+				y = 225;
+				grid = 6;
+			}
+			
+			else if(x>100 && x <= 200 && y <= 300){
+				x = 125;
+				y = 225;
+				grid = 7;
+			}
+			
+			else if(x > 200 && x <= 300 && y <= 300){
+				x = 225;
+				y = 225;
+				grid = 8;
+			}
+			
+		}
+		function play(event){
+			x=event.pageX;
+			y=event.pageY;
+			
+			
+			
+			fixXY();
+			//brenda check
+			if(y > 300){
+				return;
+			}
+			
+			if(played[grid] >= 0){
+				return;
+			}
+			
+			
+			
+			if(player % 2 == 0){
+				context.beginPath();
+				context.drawImage(mario, x, y);
+			}
+			else{
+				context.beginPath();
+				context.drawImage(mushroom, x, y);
+			}
+			
+			played[grid] = player % 2;
+			//0 is mario, 1 is mushroom
+			//document.getElementById("list").innerHTML ="grid " + grid + " player " + played[grid];
+			player ++;
+			win();
+		}
+		
+		function win(){
+			if(played[0] == played[1] && played[1] == played[2]){
+				document.getElementById("winner").innerHTML = playerName[played[0]] + " wins!";
+				context.moveTo(10,50);	
+				context.lineTo(290,50);
+                canvas.removeEventListener("mousedown", play, false);
+			     
+				
+			}
+			
+			if(played[3] == played[4] && played[4] == played[5]){
+				document.getElementById("winner").innerHTML = playerName[played[3]] + " wins!";
+				context.moveTo(10,150);	
+				context.lineTo(290,150);
+                canvas.removeEventListener("mousedown", play, false);
+			}
+			
+			if(played[6] == played[7] && played[7] == played[8]){
+				document.getElementById("winner").innerHTML = playerName[played[6]] + " wins!";
+				context.moveTo(10,250);	
+				context.lineTo(290,250);
+                canvas.removeEventListener("mousedown", play, false);
+			}
+			
+			if(played[0] == played[3] && played[3] == played[6]){
+				document.getElementById("winner").innerHTML = playerName[played[0]] + " wins!";
+				context.moveTo(50,10);	
+				context.lineTo(50,290);
+                canvas.removeEventListener("mousedown", play, false);
+			}
+			
+			if(played[1] == played[4] && played[4] == played[7]){
+				document.getElementById("winner").innerHTML = playerName[played[1]] + " wins!";
+				context.moveTo(150,10);	
+				context.lineTo(150,290);
+                canvas.removeEventListener("mousedown", play, false);
+			}
+			
+			if(played[2] == played[5] && played[5] == played[8]){
+				document.getElementById("winner").innerHTML = playerName[played[2]] + " wins!";
+				context.moveTo(250,10);	
+				context.lineTo(250,290);
+                canvas.removeEventListener("mousedown", play, false);
+			}
+			
+			if(played[0] == played[4] && played[4] == played[8]){
+				document.getElementById("winner").innerHTML = playerName[played[0]] + " wins!";
+				context.moveTo(10,10);	
+				context.lineTo(290,290);
+                canvas.removeEventListener("mousedown", play, false);
+			}
+			
+			if(played[2] == played[4] && played[4] == played[6]){
+				document.getElementById("winner").innerHTML = playerName[played[2]] + " wins!";
+				context.moveTo(290,10);	
+				context.lineTo(10,290);
+                canvas.removeEventListener("mousedown", play, false);
+			}
+			
+			context.strokeStyle="#c74c0e";
+			context.lineWidth=8;
+			context.stroke();
+	
+		}
+		
+		function playAgain(){
+			drawBoard();
+			player = 0;
+			for(x=0; x < 9; x++){
+				played[x] = x - 10;
+			}
+			document.getElementById("winner").innerHTML = "";
+			
+		}
+	</script>
+</head>
+<body onLoad="getDrawingSurfaces();getImages();drawBoard();">
+<img src="images/mushroom.png" id="mushroomImg" style="display:none;"	>
+<img src="images/mario.png" id="marioImg" style="display:none;">
+<img src="images/marioBackground.png" id="bg" style="display:none;">
+<br>
+<h1>Mario Tic Tac Toe</h1>
+<canvas id="theBoard" width="300" height="358">
+You cannot play Tic Tac Toe on your browser :(
+</canvas>
+
+<h1 id="winner"></h1>
+<span class="myButton" id="myButton" onClick="playAgain();">Play Again</span>
+
+
+</body>
+</html>
